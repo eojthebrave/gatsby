@@ -153,6 +153,18 @@ exports.sourceNodes = async (
           } else if (ids[v.data.id]) {
             node.relationships[`${k}___NODE`] = createNodeId(v.data.id)
           }
+
+          // For Drupal image/file fields which can have meta data associated
+          // with the content node they are related to we add a field to contain
+          // that meta data. Otherwise it's lost because the relationship will
+          // is to the file entity which doesn't contain the content entity
+          // specific data.
+          if (
+            (v.data.type === `file--file` || v.data.type === `files`) &&
+            _.isObject(v.data.meta)
+          ) {
+            node[`${k}__meta`] = v.data.meta
+          }
         })
       }
 
